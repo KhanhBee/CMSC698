@@ -1,14 +1,17 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import IngredientPhotoUploader from '@/components/IngredientPhotoUploader';
+import { saveIngredients } from '@/lib/storage';
 
 export default function Home() {
-  const [file, setFile] = useState<File|null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [ingredients, setIngredients] = useState<string[]>([]);
+  const router = useRouter();
 
   function handleMockScan() {
     if (!file) return;
-    setIngredients(['tomato','onion','eggs']); // placeholder
+    setIngredients(['tomato', 'onion', 'eggs']); // just placeholder for now
   }
   function handleAdd() {
     const name = prompt('Add an ingredient:');
@@ -17,7 +20,12 @@ export default function Home() {
   function handleRemove(i: number) {
     setIngredients(prev => prev.filter((_, idx) => idx !== i));
   }
+  function handleContinue() {
+    saveIngredients(ingredients);
+    router.push('/recipes');
+  }
 
+  // Mobile UI off
   return (
     <main className="min-h-dvh bg-gray-50">
       <div className="max-w-3xl mx-auto p-6 space-y-8">
@@ -35,6 +43,13 @@ export default function Home() {
               Scan ingredients (mock)
             </button>
             <button onClick={handleAdd} className="px-4 py-2 rounded-xl border">Add manually</button>
+            <button
+              onClick={handleContinue}
+              disabled={ingredients.length === 0}
+              className="px-4 py-2 rounded-xl bg-emerald-600 text-white disabled:opacity-50"
+            >
+              Continue → Recipes
+            </button>
           </div>
 
           {ingredients.length === 0 ? (
