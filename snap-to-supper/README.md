@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Description
+Snap-to-Supper is a simple cooking helper: you take or upload a photo of the ingredients you have, clean up the list if needed, and the app suggests recipes that use many of those items. Each recipe shows steps, time, servings, and at-a-glance nutrition per serving. Works on phone or laptop, with automated or manual edits at every step.
 
-## Getting Started
+# Changelog
 
-First, run the development server:
+## Tues 09/30 - Project setup & UI
+* Main plan: photo → ingredients → recipes → nutrition.
+* Scaffolded Next.js (TypeScript + Tailwind, app router) in `snap-to-supper`.
+* Built IngredientPhotoUploader: choose/take a photo and preview it.
+* Added editable ingredient elements: placeholder scan feature, manual add, remove.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Sun 10/05 - Placeholder recipes page
+* Local storage for ingredient list.
+* Added routing.
+* Basic match score functionality.
+* Added Recipe cards.
+* Fixed a lot of path issues.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Thurs 10/16 - Nutrition view + recipe generation
+* Added the first version of the nutrition placeholder page.
+* Implemented recipe generation using the **school’s GPT-OSS model** (JSON-only recipes).
+* Integrated recipe selection → open detail modal → display nutrition placeholder.
+* Fixed several JSON parsing bugs from GPT-OSS (invalid arrays, trailing commas).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Sat 10/25 - Floating nutrition tab & UI fixes
+* Converted the nutrition page into a **floating tab** inside the recipe detail window, so the recipe page doesn’t reload on back navigation.
+* Improved scroll behavior on mobile (prevented background scrolling when detail modal is open).
+* Fixed bug where recipe details sometimes lost state after closing the modal.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Sun 11/02 - Google Vision integration
+* Added Google Vision API to the `/api/scan` route.
+* Implemented label extraction → cleaned into ingredient list.
+* Added canonicalization step to filter out vague labels (e.g. “vegetable,” “meat”).
+* Attempted adding manual “guard rails” to improve accuracy:
+  - Limited labels by confidence score
+  - Ignored generic abstract labels
+  - Forced LLM post-processing to unify names  
+  **→ results were still inconsistent and often too vague.**
+* Encountered TypeScript issues with Google Vision’s type definitions (`maxResults` error).
 
-## Learn More
+## Sun 11/09 - Switched to Clarifai model + faster recipe generation
+* Replaced Google Vision with **Clarifai’s food-item-recognizer**, which returned much more specific ingredient names.
+* Updated ingredient normalization to match Clarifai output format.
+* Replaced the school’s GPT-OSS recipe generator with **OpenAI gpt-4o-mini**, giving:
+  - Faster generation  
+  - More accurate ingredient usage  
+  - More consistent JSON  
+* Added better error boundary in `/api/recipes` to handle malformed model responses.
+* Fixed UI bug where ingredient edits did not persist before generating recipes.
 
-To learn more about Next.js, take a look at the following resources:
+## Wed 11/19 - Favorites system
+* Added **favorite recipe** button in the floating recipe detail modal.
+* Implemented localStorage persistence for saved recipes.
+* Added top-right navigation button to open the Favorites view before scanning.
+* Built a simple saved-recipes page with listing + quick access to details.
+* Fixed bug where recipe IDs collided between AI-generated sets.
+* Improved overall stability in recipe modal open/close transitions.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Coming soon / in progress
+* Implementing a more attractive and intuitive Mobile UI.
